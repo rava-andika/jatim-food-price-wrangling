@@ -1,152 +1,163 @@
-# Data Wrangling: Harga Pangan Jawa Timur 2024 (Paket D)
+# East Java Food Commodity Price Wrangling & Disparity Analysis (2024)
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Pandas](https://img.shields.io/badge/Pandas-2.0%2B-150458.svg?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
 [![Status](https://img.shields.io/badge/Status-Completed-success.svg)]()
-[![Institution](https://img.shields.io/badge/UNESA-S1%20Sains%20Data-blueviolet.svg)](https://datascience.fmipa.unesa.ac.id)
+[![Institution](https://img.shields.io/badge/UNESA-B.Sc.%20Data%20Science-blueviolet.svg)](https://datascience.fmipa.unesa.ac.id)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-Repositori ini memuat implementasi *end-to-end* **Data Wrangling** terhadap data harga pangan di 9 kabupaten/kota Jawa Timur sepanjang tahun 2024. Data harga pangan diintegrasikan dengan data cuaca harian dan data karakteristik wilayah administrasi/demografi untuk mendukung analisis pemantauan harga pangan mingguan bagi tim analitik dinas ketahanan pangan.
+An end-to-end **Data Wrangling & Analytics** pipeline integrating multi-source public datasets to monitor traditional market food prices across 9 regencies and cities in East Java throughout 2024. The project harmonizes daily food commodity prices with meteorological observations and official administrative/demographic data to deliver clean, analysis-ready daily and weekly datasets for regional food security monitoring.
 
-Proyek ini merupakan pemenuhan **Ujian Tengah Semester (UTS) Gasal 2026/2027** mata kuliah **Data Wrangling** pada program studi S1 Sains Data, Universitas Negeri Surabaya.
-
----
-
-## 1. Fokus Analisis Paket D
-
-Analisis utama berfokus pada dua kelompok komoditas strategis:
-1. **Beras Antarkualitas**: Beras Kualitas Bawah I, Beras Kualitas Medium I, dan Beras Kualitas Super I.
-2. **Minyak Goreng**: Minyak Goreng Curah dan Minyak Goreng Kemasan Bermerk 1.
-
-### Pertanyaan Analisis:
-> *"Seberapa besar selisih harga antarkualitas beras (bawah, medium, super) dan antara minyak goreng curah dan kemasan di tiap kabupaten/kota, dan apakah selisih tersebut stabil atau berubah selama Januari–Desember 2024?"*
+This repository represents the official deliverable for the **Midterm Project (UTS Gasal 2026/2027)** in the **Data Wrangling** course, Undergraduate Data Science Program, Faculty of Mathematics and Natural Sciences, **Universitas Negeri Surabaya (UNESA)**.
 
 ---
 
-## 2. Sumber Data
+## 1. Analytical Focus: Package D
 
-Seluruh data mentah diambil dari sumber publik resmi tanpa rekayasa data awal:
+The analysis investigates price hierarchy, quality premia, and temporal stability across two vital food commodity groups:
+1. **Rice Quality Tiers**: Lower Quality I (*Beras Kualitas Bawah I*), Medium Quality I (*Beras Kualitas Medium I*), and Super Quality I (*Beras Kualitas Super I*).
+2. **Cooking Oil Variants**: Bulk Unbranded (*Minyak Goreng Curah*) vs. Branded Packaged 1 (*Minyak Goreng Kemasan Bermerk 1*).
 
-| No | Sumber Data | Berkas Mentah | Format & Karakteristik |
+### Core Research Questions:
+> 1. *What is the price spread between different quality tiers of rice and between bulk vs. branded packaged cooking oil across regencies and cities in East Java?*
+> 2. *Do these price margins remain stable, or do they fluctuate dynamically between January and December 2024?*
+
+---
+
+## 2. Multi-Source Raw Data
+
+All raw inputs are derived from authoritative, publicly accessible government and meteorological repositories without manual pre-cleaning:
+
+| No | Source Entity | Raw File | Data Format & Characteristics |
 |:--:|:---|:---|:---|
-| 1 | **PIHPS Nasional** (Bank Indonesia) | `pihps_pasar_tradisional_jatim_2024.xlsx` | Excel 9 sheet (satu sheet per kab/kota), matriks lebar 262 kolom tanggal harian. |
-| 2 | **NOAA GSOD** (NCEI, AS) | `noaa_gsod_jatim_2024.csv` | CSV ringkasan cuaca 4 stasiun (Surabaya Perak, Surabaya Juanda, Sumenep, Banyuwangi), satuan °F dan inci, kode sentinel `999.9` / `99.99`. |
-| 3 | **Kepmendagri No 300.2.2-2138 Tahun 2025** | `kode_wilayah_jatim.csv`, `penduduk_jatim.csv`, `luas_jatim.csv` | CSV hierarki 9.199 unit wilayah (provinsi s.d. desa) serta data kependudukan dan luas daratan per kabupaten/kota. |
+| 1 | **PIHPS Nasional**<br>*(Bank Indonesia)* | `pihps_pasar_tradisional_jatim_2024.xlsx` | 9-sheet Excel workbook (one sheet per region), wide-format matrix with 262 business-day columns, strings with comma separators (`"12,900"`), missing markers (`"-"`). |
+| 2 | **NOAA GSOD**<br>*(NCEI, United States)* | `noaa_gsod_jatim_2024.csv` | Daily surface weather summaries from 4 stations in East Java, imperial units (°F, inches), sentinel missing codes (`999.9`, `99.99`), station duplicates in Surabaya. |
+| 3 | **Kepmendagri No 300.2.2-2138 (2025)**<br>*(Ministry of Home Affairs)* | `kode_wilayah_jatim.csv`<br>`penduduk_jatim.csv`<br>`luas_jatim.csv` | Official hierarchy of 9,199 administrative codes (provinces down to villages), population headcounts, and geographic land area per regency/city. |
 
 ---
 
-## 3. Struktur Repositori
+## 3. Repository Architecture
 
 ```text
 jatim-food-price-wrangling/
 │
-├── UTS_DataWrangling_Paket_D.ipynb   # Notebook utama: proses wrangling & analisis lengkap
+├── UTS_DataWrangling_Paket_D.ipynb   # Master Jupyter Notebook (complete execution & outputs)
 │
-├── UTS_DW_data/                      # Folder data mentah asli
-│   ├── 1_harga_pasar_tradisional/   # Data mentah PIHPS (Excel)
-│   ├── 2_cuaca_stasiun/             # Data mentah NOAA GSOD (CSV)
-│   ├── 3_wilayah/                   # Data mentah Kepmendagri (3 file CSV)
-│   ├── PETUNJUK.md                  # Petunjuk teknis pengerjaan
-│   └── SUMBER_DATA.md               # Dokumentasi asal data resmi
+├── UTS_DW_data/                      # Original unedited raw data
+│   ├── 1_harga_pasar_tradisional/   # Raw PIHPS daily market price workbook
+│   ├── 2_cuaca_stasiun/             # Raw NOAA GSOD weather summaries
+│   ├── 3_wilayah/                   # Raw Kepmendagri administrative CSV files
+│   ├── PETUNJUK.md                  # Academic prompt & guidelines
+│   └── SUMBER_DATA.md               # Raw data provenance documentation
 │
-├── data_processed/                   # Dataset analitik akhir siap pakai
-│   ├── harga_pangan_jatim_2024.csv           # Dataset terintegrasi tingkat harian (46.112 baris)
-│   └── harga_pangan_jatim_mingguan_2024.csv  # Dataset terintegrasi tingkat mingguan (9.328 baris)
+├── data_processed/                   # Clean, integrated analytical datasets
+│   ├── harga_pangan_jatim_2024.csv           # Daily integrated observation level (46,112 rows × 16 cols)
+│   └── harga_pangan_jatim_mingguan_2024.csv  # Weekly ISO-calendar aggregated dataset (9,328 rows × 19 cols)
 │
-├── kamus_data.md                     # Kamus data lengkap seluruh variabel
-├── laporan.pdf                       # Dokumen laporan resmi UTS Data Wrangling
-├── .gitignore                        # Konfigurasi file yang diabaikan git
-└── README.md                         # Dokumentasi proyek
+├── kamus_data.md                     # Comprehensive technical data dictionary
+├── laporan.pdf                       # Official academic final project report (PDF)
+├── .gitignore                        # Git ignore specifications
+└── README.md                         # Project documentation (this file)
 ```
 
 ---
 
-## 4. Alur Metodologi Data Wrangling
+## 4. Data Wrangling Methodology (6-Stage Pipeline)
 
-Alur kerja mengikuti standar 6 fase data wrangling:
+```
+Discovery ──► Structuring ──► Cleaning ──► Enriching ──► Validating ──► Publishing
+```
 
-1. **Discovery (Penemuan)**: Pemeriksaan metadata, dimensi tabel, tipe data awal, nilai sentinel (`999.9`, `99.99`, `-`), dan inkonsistensi nama entitas wilayah.
-2. **Structuring (Penstrukturan)**:
-   - *Unpivoting* (melt) 262 kolom tanggal PIHPS menjadi format panjang (*tidy data*).
-   - Pemisahan baris agregat kategori (`level == 1`) dan komoditas spesifik (`level == 2`).
-   - Ekstraksi hierarki kode wilayah Kepmendagri via regex untuk menghitung jumlah kecamatan (`35.xx.xx`), kelurahan (`35.xx.xx.1xxx`), dan desa (`35.xx.xx.2xxx`).
-3. **Cleaning (Pembersihan)**:
-   - Pembersihan teks angka berkoma (`"12,900"`) menjadi numerik `float64`.
-   - Konversi satuan imperial cuaca ke metrik: Suhu ke Celcius ($^\circ\text{C} = (\text{F}-32) \times 5/9$) dan curah hujan ke milimeter ($\text{mm} = \text{inci} \times 25.4$).
-   - Netralisasi kode sentinel kosong `999.9` dan `99.99` menjadi `NaN`.
-   - Imputasi 101 missing data harga harian intermiten menggunakan **interpolasi linear dalam grup `(wilayah, komoditas)`** berdasarkan urutan waktu.
-4. **Enriching (Pengayaan & Integrasi)**:
-   - Kalkulasi kepadatan penduduk ($\text{jiwa/km}^2 = \text{total penduduk} / \text{luas}$).
-   - Agregasi rata-rata harian 2 stasiun cuaca Surabaya (Perak & Juanda) untuk eliminasi duplikasi baris.
-   - Penyelarasan waktu ke kalender standar ISO (`tahun_iso`, `minggu_ke`).
-   - Penggabungan data melalui **`LEFT JOIN`** berbasis kode wilayah resmi `35.xx` (Kepmendagri) sebagai *single source of truth*.
-5. **Validating (Validasi)**:
-   - Verifikasi integritas jumlah baris (0 baris harga pangan yang hilang pasca-join).
-   - Deteksi outlier ganda menggunakan metode **IQR** dan **Z-Score berbasis MAD** (outlier dipertahankan dengan *flagging* karena mencerminkan dinamika riil HBKN Ramadan dan masa paceklik).
-   - Evaluasi 4 dimensi kualitas data: *Completeness*, *Validity*, *Consistency*, dan *Uniqueness*.
-6. **Publishing (Penyajian)**:
-   - Ekspor dataset bersih ke format CSV di `data_processed/`.
-   - Penyusunan dokumentasi teknis `kamus_data.md` dan visualisasi analitik tren bulanan.
-
----
-
-## 5. Ringkasan Temuan Utama Paket D
-
-### A. Selisih Harga Antarkualitas Beras
-* Struktur harga beras selalu berjenjang positif ($Bawah < Medium < Super$) di seluruh 9 wilayah.
-* **Margin Super I vs Medium I**: Tertinggi berada di **Kota Madiun (Rp 2.789,89/kg)** dan **Kab. Banyuwangi (Rp 2.185,02/kg)**. Selisih paling tipis di **Kota Probolinggo (Rp 469,47/kg)** dan **Kota Malang (Rp 608,59/kg)**.
-* **Margin Medium I vs Bawah I** *(pada 6 wilayah yang mencatat)*: Tertinggi di **Kab. Jember (Rp 1.637,50/kg)** dan **Kab. Sumenep (Rp 1.486,45/kg)**. Terendah di **Kota Probolinggo (Rp 383,97/kg)** dan **Kota Surabaya (Rp 477,77/kg)**.
-* *Catatan Keterbatasan:* Beras Kualitas Bawah I tidak pernah dicatat oleh PIHPS di Kab. Banyuwangi, Kota Kediri, dan Kota Madiun.
-
-### B. Selisih Harga Minyak Goreng (Kemasan Bermerk 1 vs Curah)
-* Minyak Kemasan Bermerk 1 konsisten lebih mahal dibanding Minyak Curah di semua daerah.
-* Margin kemasan tertinggi berada di wilayah kabupaten: **Kab. Banyuwangi (Rp 2.964,22/liter)** dan **Kab. Jember (Rp 2.520,33/liter)**.
-* Margin tersempit berada di sentra logistik perkotaan: **Kota Madiun (Rp 736,07/liter)** dan **Kota Kediri (Rp 895,42/liter)**.
-
-### C. Stabilitas Selisih Harga Sepanjang 2024
-* **Beras**: Berfluktuasi secara musiman di daerah sentra agraris (Kab. Sumenep std Rp 752,43; Kota Madiun std Rp 714,16), menyempit saat harga beras medium melonjak pada musim paceklik sebelum panen raya (Februari–Maret 2024), lalu melebar kembali pasca panen. Sebaliknya di Kota Surabaya dan Kota Malang, harga ketiga mutu beras sangat stabil terkontrol ($CV < 2,2\%$, std selisih Rp 169,62).
-* **Minyak Goreng**: Terjadi **penyempitan margin secara tajam dan sistematis dari Januari ke Desember 2024** di hampir semua wilayah (contoh di Kota Surabaya: selisih turun dari Rp 4.210 di awal tahun menjadi -Rp 490 di akhir tahun). Hal ini dipicu oleh tren kenaikan harga Minyak Curah yang merangkak naik secara berkelanjutan sepanjang 2024 ($CV = 6,13\% - 8,28\%$), sementara harga Kemasan Bermerk 1 tertahan kaku di sekitar batas HET pemerintah ($CV = 0,63\% - 4,43\%$).
+1. **Discovery**:
+   - Inspected file encodings, schema dimensions, missing patterns, sentinel values (`999.9`, `99.99`, `"-"`), and regional naming discrepancies.
+2. **Structuring**:
+   - *Unpivoted* (`pd.melt`) the 262 wide-format daily date columns into long-format tidy rows.
+   - Segregated aggregate category rows (`level == 1`) from specific sub-commodity variants (`level == 2`).
+   - Parsed hierarchical administrative codes via regex to count subdistricts (`35.xx.xx`), urban wards/kelurahan (`35.xx.xx.1xxx`), and rural villages/desa (`35.xx.xx.2xxx`).
+3. **Cleaning**:
+   - Stripped comma thousand-separators and leading spaces from price text; casted to `float64`.
+   - Converted imperial weather units to metric: Temperature to Celsius ($^\circ\text{C} = (\text{F}-32) \times 5/9$) and precipitation to millimeters ($\text{mm} = \text{inches} \times 25.4$).
+   - Neutralized NOAA sentinel missing markers (`999.9` and `99.99`) to `np.nan`.
+   - Imputed 101 intermittent missing daily prices using **chronological linear interpolation within `(region, commodity)` groups** followed by forward/backward fill at sequence edges.
+4. **Enriching & Integration**:
+   - Derived population density ($\text{people/km}^2 = \text{population} / \text{land area}$).
+   - Averaged observations from the two overlapping Surabaya weather stations (Perak & Juanda) to prevent row multiplicity upon join.
+   - Synchronized timeline to the standard ISO-8601 calendar week (`tahun_iso`, `minggu_ke`).
+   - Executed **`LEFT JOIN`** using official Kepmendagri regional codes (`35.xx`) as the authoritative primary key.
+5. **Validating**:
+   - Asserted relational integrity: 100% of price records retained (0 rows dropped).
+   - Conducted dual-method outlier detection via **Interquartile Range (IQR)** and **Modified Z-Score (MAD)**. Extreme values were flagged but preserved as genuine economic reflections of pre-harvest and Ramadan market spikes.
+   - Audited four dimensions of data quality: *Completeness*, *Validity*, *Consistency*, and *Uniqueness*.
+6. **Publishing**:
+   - Exported clean analytical datasets to `data_processed/` in UTF-8 CSV format.
+   - Authored the structured data dictionary (`kamus_data.md`).
 
 ---
 
-## 6. Teknologi dan Dependensi
+## 5. Key Empirical Findings (Package D)
 
-Proyek ini dibangun menggunakan Python 3.10+ dengan pustaka-pustaka berikut:
-- **`pandas`**: Manipulasi tabular, reshape (*melt/pivot*), merge/join, dan transformasi groupby.
-- **`numpy`**: Operasi komputasi numerik, penanganan NaN, dan transformasi logaritmik.
-- **`matplotlib`** & **`seaborn`**: Visualisasi tren deret waktu, sebaran distribusi, dan komparasi selisih.
-- **`openpyxl`**: Parser berkas multi-sheet Microsoft Excel.
-- **`pathlib`**: Manajemen jalur berkas lintas sistem operasi (*cross-platform*).
+### A. Rice Quality Price Hierarchy & Margins
+* The price structure strictly adheres to an expected positive tier hierarchy across all 9 regions: $\text{Lower I} < \text{Medium I} < \text{Super I}$.
+* **Super I vs. Medium I Margin**: Widest in **Kota Madiun (+IDR 2,789.89/kg)** and **Kab. Banyuwangi (+IDR 2,185.02/kg)**; narrowest in **Kota Probolinggo (+IDR 469.47/kg)** and **Kota Malang (+IDR 608.59/kg)**.
+* **Medium I vs. Lower I Margin** *(across the 6 reporting regions)*: Widest in **Kab. Jember (+IDR 1,637.50/kg)** and **Kab. Sumenep (+IDR 1,486.45/kg)**; narrowest in **Kota Probolinggo (+IDR 383.97/kg)** and **Kota Surabaya (+IDR 477.77/kg)**.
+* *Data Limitation Note:* Lower Quality I Rice was structurally unmonitored by PIHPS in Kab. Banyuwangi, Kota Kediri, and Kota Madiun.
 
-### Instalasi Lingkungan:
+### B. Cooking Oil Price Hierarchy (Branded Packaged 1 vs. Bulk Curah)
+* Branded Packaged 1 Cooking Oil commands a consistent packaging and brand premium over unbranded bulk oil across all territories.
+* Premium margins are widest in rural/regency regions: **Kab. Banyuwangi (+IDR 2,964.22/liter)**, **Kab. Jember (+IDR 2,520.33/liter)**, and **Kab. Sumenep (+IDR 2,375.76/liter)**.
+* Margins are tightest in urban distribution hubs: **Kota Madiun (+IDR 736.07/liter)** and **Kota Kediri (+IDR 895.42/liter)**.
+
+### C. Temporal Stability and Market Dynamics Throughout 2024
+* **Rice Market Dynamics**: Highly seasonal in agricultural production hubs (e.g., Kab. Sumenep monthly std = IDR 752.43; Kota Madiun std = IDR 714.16). Quality spreads contracted sharply during February–March 2024 (*paceklik* / pre-harvest season and the onset of Ramadan) due to steeper price surges in medium rice, widening back out following the main harvest. Conversely, metropolitan hubs (Kota Surabaya and Kota Malang) exhibited tightly regulated, stable rice prices year-round ($CV < 2.2\%$, spread std = IDR 169.62).
+* **Cooking Oil Compression**: Experienced a **systematic and dramatic margin compression from January to December 2024** across 8 of 9 regions (e.g., in Surabaya, the packaged-to-bulk spread contracted from +IDR 4,210 to -IDR 490). This compression was driven by a relentless rise in bulk oil prices throughout 2024 ($CV = 6.13\% - 8.28\%$), whereas branded packaged prices remained anchored near government retail ceiling regulations (HET) ($CV = 0.63\% - 4.43\%$).
+
+---
+
+## 6. Tech Stack & Environment
+
+Built with **Python 3.10+** utilizing core data science libraries:
+* **`pandas`**: High-performance data structures, DataFrame transformations, unpivoting (`melt`), pivoting, and groupby aggregations.
+* **`numpy`**: Vectorized numerical computations, sentinel handling, and log transformations.
+* **`matplotlib`** & **`seaborn`**: Statistical visualizations, multi-panel line plots, and distribution KDE plots.
+* **`openpyxl`**: Parsing multi-sheet Excel workbooks.
+* **`pathlib`**: Cross-platform file path resolution.
+
+### Quick Setup:
 ```bash
-pip install pandas numpy matplotlib seaborn openpyxl
+pip install pandas numpy matplotlib seaborn openpyxl jupyter
 ```
 
 ---
 
-## 7. Cara Menjalankan Proyek
+## 7. How to Reproduce
 
-1. **Clone repositori ini**:
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/rava-andika/jatim-food-price-wrangling.git
    cd jatim-food-price-wrangling
    ```
-2. **Jalankan Jupyter Notebook**:
+2. **Launch Jupyter Notebook**:
    ```bash
    jupyter notebook UTS_DataWrangling_Paket_D.ipynb
    ```
-3. **Eksekusi Notebook**:
-   Pilih menu `Kernel` $\rightarrow$ `Restart & Run All`. Seluruh proses dari Tahap 3 (pembacaan) hingga Tahap 8 (penyimpanan dataset akhir) akan dieksekusi secara otomatis.
-4. **Periksa Hasil**:
-   File dataset akhir akan tersimpan di dalam folder `data_processed/`.
+3. **Execute the Pipeline**:
+   Select `Kernel` $\rightarrow$ `Restart & Run All`. All stages from raw file ingestion to final analytical dataset export will run sequentially in approximately 10–15 seconds.
+4. **Inspect Generated Datasets**:
+   Processed files are automatically updated in [`data_processed/`](data_processed/).
 
 ---
 
-## 8. Lisensi & Hak Penggunaan
+## 8. Provenance, Licensing & Author
 
-Data mentah bersumber dari domain publik:
-- **PIHPS Nasional (Bank Indonesia)**: Publikasi laporan harian pasar tradisional.
-- **NOAA NCEI (Global Summary of the Day)**: Data domain publik pemerintah AS.
-- **Kepmendagri No 300.2.2-2138 Tahun 2025**: Dokumen hukum pemerintahan Republik Indonesia.
+### Data Provenance
+* **PIHPS Nasional (Bank Indonesia)**: Public traditional market daily price bulletins.
+* **NOAA NCEI (Global Summary of the Day)**: Public domain U.S. government environmental data.
+* **Kepmendagri No 300.2.2-2138 (2025)**: Public domain official statutory legal gazette of the Republic of Indonesia.
 
-Kode dan dokumentasi ini dikembangkan untuk tujuan akademik dan portofolio data science oleh **Rava Dwi Andika** (NIM: 25031554039), S1 Sains Data, Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Negeri Surabaya.
+### Author & Academic Integrity
+* **Author**: Rava Dwi Andika
+* **Student ID (NIM)**: 25031554039
+* **Program**: Undergraduate in Data Science (B.Sc.), Universitas Negeri Surabaya (UNESA)
+* **Academic Year**: Gasal 2026/2027
+
+*Code and documentation are released under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) license for academic and educational portfolio purposes.*
