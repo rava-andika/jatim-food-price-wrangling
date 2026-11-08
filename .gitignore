@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary Word & Office files
+~$*
+*.tmp
+
+# Submission zip archives
+*.zip
+
+# Intermediate output & draft notebooks
+FIKS UTS_DataWrangling_PaketD_25031554039.ipynb
+UTS_DataWrangling_Paket_D copy.ipynb
+notebook/
+output/
+LAPORAN UTS DATA WRANGLING.docx
+LAPORAN_UTS_DATA_WRANGLING_PAKET_D.docx
+build_*.py
+finalize_*.py
+generate_*.py
+run_*.py
